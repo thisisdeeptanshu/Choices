@@ -1,0 +1,115 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<style>
+    .container {
+        border: 1px solid #F7747B;
+        color: #FE8F6B;
+        padding: 80px 30px;
+    }
+    h1, h2 {
+        font-size: 3rem;
+        transition: 0.3s;
+        margin-bottom: 0;
+    }
+    h2 {
+        margin-top: 0;
+        font-size: 2rem;
+    }
+    input[type=submit] {
+        all: unset;
+        cursor: pointer;
+    }
+    form {
+        margin: 0;
+        padding: 0;
+    }
+    .selection, .selected {
+        width: 500px;
+        height: 50px;
+        margin: 25px;
+        border-radius: 5px;
+        border: 1px solid #F7747B;
+        font-size: 40px;
+        color: #F7747B;
+        transition: 0.3s;
+    }
+    .selection:hover {
+        color: #FE8F6B;
+        border-color: #FE8F6B;
+    }
+    .selected {
+        background-color: #F7747B;
+        color: #1a1a1a;
+    }
+    .selected:hover, .selection:hover {
+        background-color: #FE8F6B;
+        color: #1a1a1a;
+    }
+    input[type=text] {
+        all: unset;
+        text-align: center;
+        cursor: default;
+    }
+</style>
+<div class="nav">
+    <h1 class="underline"><a href="/">Home</a></h1>
+    <h1 class="underline"><a href="/create">Create</a></h1>
+    {% if loggedIn %}
+        <h1 class="underline"><a href="/profile">Profile</a></h1>
+    {% else %}
+        <h1 class="underline"><a href="/login">Login</a></h1>
+    {% endif %}
+</div>
+<form action="#" method="POST">
+    <div class="center">
+        <div class="container">
+            <h1 style="text-align: center;margin-top: 0;">{{ data["name"] }}</h1><h2 style="text-align: center;">by {{ data["by"] }}</h2>
+            {% for i in data["options"] %}
+                <div style="overflow: hidden;" class="center selection" onclick="select(this)"><input type="text" value="{{ i }}" data-votes="{{ data['votes'][i] }}" readonly></div>
+            {% endfor %}
+            {% if not contains %}
+                <h1 style="text-decoration: underline;text-align: center;"><input type="submit" value="Vote"></h1>
+            {% else %}
+            <script>
+                let total = 0;
+                Array.from(document.getElementsByTagName("input")).forEach((e) => {
+                    if (e.getAttribute("type") == "text") {
+                        total += parseInt(e.dataset.votes);
+                    }
+                })
+                Array.from(document.getElementsByTagName("input")).forEach((e) => {
+                    if (e.getAttribute("type") == "text") {
+                        let amount =  Math.floor((e.dataset.votes/total)*100);
+                        if (amount > 50) {
+                            amount = 100 - amount;
+                            e.style.background = `linear-gradient(to right, #2f2f2f ${(100 - amount)}%, transparent ${amount}%)`;
+                        } else {
+                            e.style.background = `linear-gradient(to left, transparent ${(100 - amount)}%, #2f2f2f ${amount}%)`;
+                        }
+                    }
+                })
+            </script>
+            {% endif %}
+        </div>
+    </div>
+</form>
+<script>
+    function select(e) {
+        if (e.getAttribute("class") == "center selection") {
+            Array.from(document.getElementsByClassName("center selected")).forEach((e2) => {
+                e2.setAttribute("class", "center selection");
+                e2.firstChild.setAttribute("name", "");
+            })
+            e.setAttribute("class", "center selected");
+            e.firstChild.setAttribute("name", "selected");
+        } else {
+            e.setAttribute("class", "center selection");
+            e.firstChild.setAttribute("name", "");
+        }
+    }
+</script>
+<script>
+    // https://stackoverflow.com/questions/3759981/get-ip-address-of-visitors-using-flask-for-python
+    if ( window.history.replaceState ) {
+        window.history.replaceState( null, null, window.location.href );
+    }
+</script>
